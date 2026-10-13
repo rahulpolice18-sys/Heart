@@ -285,17 +285,17 @@ with hero_col:
 with image_col:
     image_path = BASE_DIR / "heart_banner.png"
 
-        if image_path.is_file():
-        st.image(
-            str(image_path),
-            caption="Understanding the human heart",
-            use_column_width=True
-        )
-    else:
-        st.warning(
-            "Image not found. Upload heart_banner.png "
-            "beside app.py in your GitHub repository."
-        )
+if image_path.is_file():
+    st.image(
+        str(image_path),
+        caption="Understanding the human heart",
+        use_column_width=True
+    )
+else:
+    st.warning(
+        "Image not found. Upload heart_banner.png "
+        "beside app.py in your GitHub repository."
+    )
 
 # ==================================================
 # OVERVIEW CARDS
