@@ -1,3 +1,4 @@
+import traceback
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -83,18 +84,16 @@ for name, path in model_paths.items():
             f"({type(loaded_objects[name]).__name__})"
         )
 
-    except Exception as exc:
-        st.error(f"{name} loading failed")
-        st.code(
-            f"Error type: {type(exc).__name__}\n"
-            f"Error details: {repr(exc)}"
-        )
-        st.warning(
-            "Check that this file was generated correctly and "
-            "that its training and deployment library versions "
-            "are compatible."
-        )
-        st.stop()
+except Exception as exc:
+    import traceback
+
+    st.error(f"{name} loading failed")
+    st.code(
+        f"Error type: {type(exc).__name__}\n"
+        f"Error details: {repr(exc)}"
+    )
+    st.code(traceback.format_exc())
+    st.stop()
 
 model = loaded_objects["Model"]
 scaler = loaded_objects["Scaler"]
