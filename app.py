@@ -285,26 +285,17 @@ with hero_col:
 with image_col:
     image_path = BASE_DIR / "heart_banner.png"
 
-    if image_path.is_file():
-        try:
-            st.markdown('<div class="image-frame">', unsafe_allow_html=True)
-            st.image(
-                str(image_path),
-                caption="Understanding the human heart",
-                use_container_width=True
-            )
-            st.markdown('</div>', unsafe_allow_html=True)
-        except Exception:
-            st.info(
-                "The heart image could not be displayed. "
-                "Check that heart_banner.png is a valid PNG file."
-            )
-    else:
-        st.info(
-            "Upload heart_banner.png to the same GitHub folder "
-            "as app.py to display your heart image."
+        if image_path.is_file():
+        st.image(
+            str(image_path),
+            caption="Understanding the human heart",
+            use_column_width=True
         )
-
+    else:
+        st.warning(
+            "Image not found. Upload heart_banner.png "
+            "beside app.py in your GitHub repository."
+        )
 
 # ==================================================
 # OVERVIEW CARDS
