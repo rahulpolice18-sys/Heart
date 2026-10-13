@@ -1,12 +1,13 @@
+```python
 import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
 from pathlib import Path
 
-# --------------------------------------------------
+# ==================================================
 # PAGE CONFIGURATION
-# --------------------------------------------------
+# ==================================================
 st.set_page_config(
     page_title="HeartCare AI | Heart Disease Prediction",
     page_icon="❤️",
@@ -16,206 +17,227 @@ st.set_page_config(
 
 BASE_DIR = Path(__file__).resolve().parent
 
-# --------------------------------------------------
-# CUSTOM DESIGN
-# --------------------------------------------------
+# ==================================================
+# CUSTOM CSS
+# ==================================================
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-    html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif;
-    }
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+}
 
-    .stApp {
-        background: linear-gradient(180deg, #f3f8ff 0%, #ffffff 55%, #f4f8ff 100%);
-    }
+.stApp {
+    background: linear-gradient(180deg, #edf6ff 0%, #ffffff 48%, #f3f8ff 100%);
+}
 
-    .block-container {
-        max-width: 1200px;
-        padding-top: 1.8rem;
-        padding-bottom: 3rem;
-    }
+.block-container {
+    max-width: 1200px;
+    padding-top: 1.5rem;
+    padding-bottom: 3rem;
+}
 
-    .brand {
-        font-size: 1.15rem;
-        font-weight: 800;
-        color: #1261a6;
-        letter-spacing: 0.5px;
-        margin-bottom: 1rem;
-    }
+#MainMenu, footer {
+    visibility: hidden;
+}
 
-    .hero {
-        background: linear-gradient(120deg, #073b70 0%, #0878b9 55%, #21a5ce 100%);
-        color: white;
-        border-radius: 24px;
-        padding: 34px 36px;
-        box-shadow: 0 14px 35px rgba(12, 82, 142, 0.18);
-        margin-bottom: 25px;
-    }
+.brand {
+    color: #0865a5;
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+}
 
-    .hero-label {
-        display: inline-block;
-        background: rgba(255,255,255,0.15);
-        border: 1px solid rgba(255,255,255,0.3);
-        padding: 7px 13px;
-        border-radius: 30px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        margin-bottom: 15px;
-    }
+.hero {
+    background: linear-gradient(125deg, #063767, #087db8 65%, #20a8c9);
+    padding: 35px;
+    border-radius: 23px;
+    color: white;
+    min-height: 310px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 12px 30px rgba(6, 73, 125, 0.18);
+}
 
-    .hero h1 {
-        font-size: clamp(2rem, 4vw, 3.15rem);
-        font-weight: 800;
-        line-height: 1.12;
-        margin: 0 0 15px 0;
-        color: white;
-    }
+.hero-tag {
+    display: inline-block;
+    color: #e4f6ff;
+    background: rgba(255,255,255,0.13);
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 7px 12px;
+    border-radius: 30px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    width: fit-content;
+    margin-bottom: 16px;
+}
 
-    .hero p {
-        color: #e2f3ff;
-        font-size: 1rem;
-        line-height: 1.8;
-        margin-bottom: 0;
-    }
+.hero h1 {
+    color: white;
+    font-size: clamp(2rem, 3.3vw, 3rem);
+    line-height: 1.15;
+    font-weight: 800;
+    margin: 0 0 15px 0;
+}
 
-    .section-title {
-        font-size: 1.45rem;
-        font-weight: 800;
-        color: #103a64;
-        margin: 12px 0 4px 0;
-    }
+.hero p {
+    color: #e5f4ff;
+    font-size: 0.96rem;
+    line-height: 1.8;
+    margin: 0;
+}
 
-    .section-subtitle {
-        color: #62758a;
-        margin-bottom: 20px;
-        font-size: 0.94rem;
-    }
+.image-frame {
+    background: white;
+    padding: 10px;
+    border: 1px solid #d7e8f8;
+    border-radius: 23px;
+    box-shadow: 0 12px 30px rgba(6, 73, 125, 0.12);
+    overflow: hidden;
+}
 
-    div[data-testid="stForm"] {
-        background: white;
-        padding: 25px;
-        border-radius: 20px;
-        border: 1px solid #dce9f7;
-        box-shadow: 0 8px 25px rgba(25, 74, 120, 0.06);
-    }
+.section-title {
+    color: #103e68;
+    font-size: 1.55rem;
+    font-weight: 800;
+    margin-top: 30px;
+    margin-bottom: 5px;
+}
 
-    div[data-testid="stForm"] label {
-        color: #244663;
-        font-weight: 600;
-    }
+.section-subtitle {
+    color: #667d92;
+    margin-bottom: 20px;
+    line-height: 1.7;
+}
 
-    div[data-testid="stFormSubmitButton"] button {
-        background: linear-gradient(90deg, #0878b9, #0757a3);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        min-height: 3.2rem;
-        font-size: 1rem;
-        font-weight: 700;
-        transition: 0.2s;
-    }
+.metric-card {
+    background: white;
+    border: 1px solid #dceafa;
+    border-radius: 16px;
+    padding: 20px 12px;
+    text-align: center;
+    box-shadow: 0 5px 18px rgba(20, 73, 120, 0.05);
+}
 
-    div[data-testid="stFormSubmitButton"] button:hover {
-        background: linear-gradient(90deg, #0757a3, #063e7a);
-        color: white;
-        border: none;
-    }
+.metric-value {
+    color: #0878b9;
+    font-size: 1.5rem;
+    font-weight: 800;
+}
 
-    .result-card {
-        background: white;
-        border: 1px solid #dce9f7;
-        border-radius: 20px;
-        padding: 25px;
-        box-shadow: 0 8px 25px rgba(25, 74, 120, 0.06);
-        margin-top: 18px;
-    }
+.metric-label {
+    color: #687e92;
+    font-size: 0.82rem;
+    margin-top: 5px;
+}
 
-    .result-positive {
-        background: #fff3f2;
-        border-left: 6px solid #df4545;
-        border-radius: 12px;
-        padding: 20px;
-    }
+div[data-testid="stForm"] {
+    background: white;
+    border: 1px solid #dceafa;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 7px 25px rgba(20, 73, 120, 0.06);
+}
 
-    .result-negative {
-        background: #edfbf4;
-        border-left: 6px solid #159967;
-        border-radius: 12px;
-        padding: 20px;
-    }
+div[data-testid="stForm"] label {
+    color: #244663;
+    font-weight: 600;
+}
 
-    .result-heading {
-        font-size: 1.3rem;
-        font-weight: 800;
-        margin-bottom: 8px;
-    }
+div[data-testid="stFormSubmitButton"] button {
+    background: linear-gradient(90deg, #087db8, #0756a1);
+    color: white;
+    border: 0;
+    border-radius: 12px;
+    min-height: 3.2rem;
+    font-weight: 700;
+    font-size: 1rem;
+}
 
-    .metric-card {
-        background: white;
-        border: 1px solid #dce9f7;
-        border-radius: 16px;
-        padding: 18px;
-        text-align: center;
-        height: 100%;
-    }
+div[data-testid="stFormSubmitButton"] button:hover {
+    color: white;
+    border: 0;
+    background: linear-gradient(90deg, #07659e, #063e7a);
+}
 
-    .metric-number {
-        font-size: 1.45rem;
-        font-weight: 800;
-        color: #0878b9;
-    }
+.result-card {
+    background: white;
+    border: 1px solid #dceafa;
+    border-radius: 18px;
+    padding: 24px;
+    margin-top: 18px;
+    box-shadow: 0 7px 25px rgba(20, 73, 120, 0.06);
+}
 
-    .metric-label {
-        color: #647b91;
-        font-size: 0.82rem;
-        margin-top: 5px;
-    }
+.result-positive {
+    background: #fff1f1;
+    border-left: 6px solid #d94343;
+    border-radius: 12px;
+    padding: 20px;
+    color: #782626;
+}
 
-    .info-card {
-        background: #eaf5ff;
-        border: 1px solid #cde6fb;
-        border-radius: 15px;
-        padding: 19px;
-        color: #214a6c;
-        margin-top: 18px;
-        line-height: 1.7;
-    }
+.result-negative {
+    background: #eafaf1;
+    border-left: 6px solid #159765;
+    border-radius: 12px;
+    padding: 20px;
+    color: #145b3b;
+}
 
-    .footer {
-        text-align: center;
-        color: #73869a;
-        font-size: 0.82rem;
-        padding-top: 30px;
-        line-height: 1.8;
-    }
+.result-heading {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
 
-    #MainMenu, footer {
-        visibility: hidden;
-    }
+.notice {
+    background: #eaf5ff;
+    border: 1px solid #cce5fb;
+    border-radius: 14px;
+    padding: 18px;
+    color: #244b6c;
+    line-height: 1.8;
+    margin-top: 20px;
+}
 
-    @media (max-width: 700px) {
-        .hero {
-            padding: 25px 22px;
-        }
-        .block-container {
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
-    }
+.footer {
+    text-align: center;
+    color: #71869a;
+    font-size: 0.82rem;
+    line-height: 1.8;
+    margin-top: 35px;
+}
+
+.stAlert {
+    border-radius: 12px;
+}
 </style>
 """, unsafe_allow_html=True)
 
 
-# --------------------------------------------------
-# LOAD MODEL FILES
-# --------------------------------------------------
+# ==================================================
+# LOAD TRAINED MODEL FILES
+# ==================================================
 @st.cache_resource
 def load_models():
-    model = joblib.load(BASE_DIR / "heart_model.pkl")
-    scaler = joblib.load(BASE_DIR / "scaler.pkl")
-    selector = joblib.load(BASE_DIR / "selector.pkl")
+    model_path = BASE_DIR / "heart_model.pkl"
+    scaler_path = BASE_DIR / "scaler.pkl"
+    selector_path = BASE_DIR / "selector.pkl"
+
+    for path in [model_path, scaler_path, selector_path]:
+        if not path.is_file():
+            raise FileNotFoundError(
+                f"Required model file is missing: {path.name}"
+            )
+
+    model = joblib.load(model_path)
+    scaler = joblib.load(scaler_path)
+    selector = joblib.load(selector_path)
+
     return model, scaler, selector
 
 
@@ -223,98 +245,111 @@ try:
     model, scaler, selector = load_models()
 except Exception:
     st.error(
-        "The prediction model could not be loaded. "
-        "Please check that heart_model.pkl, scaler.pkl, "
-        "and selector.pkl are uploaded correctly."
+        "The prediction system could not load its model files. "
+        "Please check that heart_model.pkl, scaler.pkl, and "
+        "selector.pkl are uploaded correctly and are compatible "
+        "with the installed Python libraries."
     )
     st.stop()
 
 
-# --------------------------------------------------
-# BRAND HEADER
-# --------------------------------------------------
+# ==================================================
+# HEADER
+# ==================================================
 st.markdown(
-    '<div class="brand">♥ HEARTCARE <span style="color:#71869b;'
-    'font-weight:500;">AI HEALTH TECHNOLOGY</span></div>',
+    '<div class="brand">♥ HEARTCARE AI '
+    '<span style="color:#6b8197;font-weight:500;">'
+    '| INTELLIGENT HEALTH ANALYSIS</span></div>',
     unsafe_allow_html=True
 )
 
 
-# --------------------------------------------------
-# HERO SECTION WITH YOUR IMAGE
-# --------------------------------------------------
-hero_left, hero_right = st.columns([1.05, 0.95], gap="large")
+# ==================================================
+# HERO SECTION AND HEART IMAGE
+# ==================================================
+hero_col, image_col = st.columns([1.05, 0.95], gap="large")
 
-with hero_left:
+with hero_col:
     st.markdown("""
     <div class="hero">
-        <div class="hero-label">AI-POWERED HEALTH ANALYSIS</div>
+        <div class="hero-tag">AI-POWERED HEALTH TECHNOLOGY</div>
         <h1>Understand Your Heart.<br>Protect Your Future.</h1>
         <p>
             Explore a machine-learning-based heart disease prediction
-            system using clinical measurements. Enter the available
-            patient details to generate an educational prediction.
+            system. Enter clinical measurements to see how the trained
+            model classifies the provided data.
         </p>
     </div>
     """, unsafe_allow_html=True)
 
-with hero_right:
+with image_col:
     image_path = BASE_DIR / "heart_banner.png"
 
-    if image_path.exists():
-        st.image(
-            str(image_path),
-            use_container_width=True
-        )
+    if image_path.is_file():
+        try:
+            st.markdown('<div class="image-frame">', unsafe_allow_html=True)
+            st.image(
+                str(image_path),
+                caption="Understanding the human heart",
+                use_container_width=True
+            )
+            st.markdown('</div>', unsafe_allow_html=True)
+        except Exception:
+            st.info(
+                "The heart image could not be displayed. "
+                "Check that heart_banner.png is a valid PNG file."
+            )
     else:
-        st.warning(
-            "Upload heart_banner.png to your GitHub repository "
-            "to display the heart image."
+        st.info(
+            "Upload heart_banner.png to the same GitHub folder "
+            "as app.py to display your heart image."
         )
 
 
-# --------------------------------------------------
-# QUICK OVERVIEW CARDS
-# --------------------------------------------------
-m1, m2, m3 = st.columns(3)
+# ==================================================
+# OVERVIEW CARDS
+# ==================================================
+st.markdown("<br>", unsafe_allow_html=True)
 
-with m1:
+c1, c2, c3 = st.columns(3)
+
+with c1:
     st.markdown("""
     <div class="metric-card">
-        <div class="metric-number">AI + ML</div>
-        <div class="metric-label">Prediction technology</div>
+        <div class="metric-value">AI + ML</div>
+        <div class="metric-label">Machine learning technology</div>
     </div>
     """, unsafe_allow_html=True)
 
-with m2:
+with c2:
     st.markdown("""
     <div class="metric-card">
-        <div class="metric-number">13</div>
+        <div class="metric-value">13</div>
         <div class="metric-label">Clinical input features</div>
     </div>
     """, unsafe_allow_html=True)
 
-with m3:
+with c3:
     st.markdown("""
     <div class="metric-card">
-        <div class="metric-number">Instant</div>
-        <div class="metric-label">Model output</div>
+        <div class="metric-value">Real-time</div>
+        <div class="metric-label">Prediction after submission</div>
     </div>
     """, unsafe_allow_html=True)
 
 
-# --------------------------------------------------
-# PATIENT INPUT SECTION
-# --------------------------------------------------
+# ==================================================
+# INPUT FORM
+# ==================================================
 st.markdown(
     '<div class="section-title">Patient Assessment</div>',
     unsafe_allow_html=True
 )
 
 st.markdown(
-    '<div class="section-subtitle">Enter the clinical measurements '
-    'below. Use the same units and feature definitions as your '
-    'training dataset.</div>',
+    '<div class="section-subtitle">Enter all required measurements '
+    'using the same units, category codes, and feature definitions '
+    'used to train your model.</div>',
     unsafe_allow_html=True
 )
 
@@ -333,47 +368,47 @@ with st.form("heart_prediction_form"):
     with col2:
         sex = st.selectbox(
             "Sex",
-            options=[1, 0],
+            [1, 0],
             format_func=lambda x: "Male (1)" if x == 1 else "Female (0)"
         )
 
     with col3:
         trestbps = st.number_input(
             "Resting blood pressure (mm Hg)",
-            min_value=50, max_value=250, value=120, step=1
+            min_value=50, max_value=250, value=120
         )
 
-    st.markdown("#### 02 — Blood Test Measurements")
+    st.markdown("#### 02 — Blood Measurements")
 
     col4, col5, col6 = st.columns(3)
 
     with col4:
         chol = st.number_input(
             "Serum cholesterol (mg/dl)",
-            min_value=50, max_value=700, value=200, step=1
+            min_value=50, max_value=700, value=200
         )
 
     with col5:
         fbs = st.selectbox(
-            "Fasting blood sugar > 120 mg/dl",
-            options=[0, 1],
+            "Fasting blood sugar above 120 mg/dl",
+            [0, 1],
             format_func=lambda x: "No (0)" if x == 0 else "Yes (1)"
         )
 
     with col6:
         thalach = st.number_input(
             "Maximum heart rate achieved",
-            min_value=40, max_value=250, value=150, step=1
+            min_value=40, max_value=250, value=150
         )
 
-    st.markdown("#### 03 — Heart Examination Details")
+    st.markdown("#### 03 — Heart Examination")
 
     col7, col8, col9 = st.columns(3)
 
     with col7:
         cp = st.selectbox(
             "Chest pain type (cp)",
-            options=[0, 1, 2, 3],
+            [0, 1, 2, 3],
             format_func=lambda x: {
                 0: "0 — Typical angina",
                 1: "1 — Atypical angina",
@@ -385,13 +420,13 @@ with st.form("heart_prediction_form"):
     with col8:
         restecg = st.selectbox(
             "Resting ECG result",
-            options=[0, 1, 2]
+            [0, 1, 2]
         )
 
     with col9:
         exang = st.selectbox(
             "Exercise-induced angina",
-            options=[0, 1],
+            [0, 1],
             format_func=lambda x: "No (0)" if x == 0 else "Yes (1)"
         )
 
@@ -407,45 +442,36 @@ with st.form("heart_prediction_form"):
     with col11:
         slope = st.selectbox(
             "ST segment slope",
-            options=[0, 1, 2]
+            [0, 1, 2]
         )
 
     with col12:
         ca = st.selectbox(
             "Major vessels (ca)",
-            options=[0, 1, 2, 3, 4]
+            [0, 1, 2, 3, 4]
         )
 
-    st.markdown("#### 04 — Additional Clinical Information")
+    st.markdown("#### 04 — Additional Information")
 
-    col13, col14 = st.columns(2)
-
-    with col13:
-        thal = st.selectbox(
-            "Thalassemia (thal)",
-            options=[1, 2, 3],
-            format_func=lambda x: {
-                1: "1 — Normal",
-                2: "2 — Fixed defect",
-                3: "3 — Reversible defect"
-            }[x]
-        )
-
-    with col14:
-        st.info(
-            "Check the category encodings against the dataset "
-            "used to train your model before interpreting results."
-        )
+    thal = st.selectbox(
+        "Thalassemia category (thal)",
+        [1, 2, 3],
+        format_func=lambda x: {
+            1: "1 — Normal",
+            2: "2 — Fixed defect",
+            3: "3 — Reversible defect"
+        }[x]
+    )
 
     submitted = st.form_submit_button(
-        "Analyze Measurements",
+        "♥  Analyze Measurements",
         use_container_width=True
     )
 
 
-# --------------------------------------------------
-# PREDICTION
-# --------------------------------------------------
+# ==================================================
+# RUN PREDICTION
+# ==================================================
 if submitted:
 
     feature_names = [
@@ -465,10 +491,8 @@ if submitted:
     try:
         selected_data = selector.transform(input_data)
         scaled_data = scaler.transform(selected_data)
+        prediction = model.predict(scaled_data)[0]
 
-        prediction = int(model.predict(scaled_data)[0])
-
-        st.markdown("---")
         st.markdown(
             '<div class="section-title">Prediction Results</div>',
             unsafe_allow_html=True
@@ -479,11 +503,11 @@ if submitted:
             <div class="result-card">
                 <div class="result-positive">
                     <div class="result-heading">
-                        Model indicates a potential risk
+                        Potential Risk Indicated by the Model
                     </div>
-                    The model classified this input as class 1.
-                    This is not a diagnosis. Consult a qualified
-                    healthcare professional for medical assessment.
+                    The model classified the entered measurements as
+                    class 1. This is a machine-learning output, not a
+                    medical diagnosis.
                 </div>
             </div>
             """, unsafe_allow_html=True)
@@ -493,11 +517,10 @@ if submitted:
             <div class="result-card">
                 <div class="result-negative">
                     <div class="result-heading">
-                        Model indicates a lower predicted risk
+                        Lower-Risk Class Predicted by the Model
                     </div>
-                    The model classified this input as class 0.
-                    This does not rule out heart disease or replace
-                    professional medical evaluation.
+                    The model classified the entered measurements as
+                    class 0. This result does not rule out heart disease.
                 </div>
             </div>
             """, unsafe_allow_html=True)
@@ -505,58 +528,57 @@ if submitted:
         else:
             st.warning(
                 f"The model returned class {prediction}. "
-                "Verify the target-label mapping in your training code."
+                "Verify the target labels in the training dataset."
             )
 
-        # Show probability only if the model supports it.
         if hasattr(model, "predict_proba"):
             probabilities = model.predict_proba(scaled_data)[0]
             classes = list(model.classes_)
 
             if 1 in classes:
-                risk_probability = float(
+                probability = float(
                     probabilities[classes.index(1)] * 100
                 )
 
-                st.markdown("#### Model output probability")
+                st.markdown("#### Model probability for class 1")
 
                 st.progress(
-                    int(round(risk_probability)),
-                    text=f"Probability of class 1: {risk_probability:.1f}%"
+                    int(np.clip(round(probability), 0, 100)),
+                    text=f"Class 1 probability: {probability:.1f}%"
                 )
 
                 st.caption(
-                    "This is the model's estimated probability for class 1, "
-                    "not a clinically validated estimate of your personal "
-                    "risk. Its meaning depends on the training labels and "
-                    "model calibration."
+                    "This is the model's estimated probability for "
+                    "class 1, not a clinically validated estimate of "
+                    "personal heart disease risk."
                 )
 
         st.markdown("""
-        <div class="info-card">
-            <strong>Important:</strong> This application is an educational
-            machine-learning project. It cannot diagnose, prevent, or treat
-            heart disease. If you have symptoms or concerns, seek medical
-            advice from a qualified healthcare professional.
+        <div class="notice">
+            <strong>Medical disclaimer</strong><br>
+            This application is intended for educational and
+            demonstration purposes only. It must not be used to
+            diagnose or treat heart disease. Consult a qualified
+            healthcare professional for medical advice.
         </div>
         """, unsafe_allow_html=True)
 
-    except Exception as error:
+    except Exception:
         st.error(
-            "Prediction failed. Please verify the input feature order, "
-            "category encodings, and compatibility of the saved model "
-            "files with the training pipeline."
+            "Prediction could not be completed. Verify that the "
+            "feature order, category encodings, selector, scaler, "
+            "and model match the original training pipeline."
         )
-        st.caption(f"Error details: {error}")
 
 
-# --------------------------------------------------
+# ==================================================
 # FOOTER
-# --------------------------------------------------
+# ==================================================
 st.markdown("""
 <div class="footer">
     <strong>HEARTCARE AI</strong><br>
-    Machine Learning • Clinical Data • Educational Project<br>
-    This tool is not a substitute for professional medical advice.
+    Machine Learning · Clinical Data · Educational Project<br>
+    Not a substitute for professional medical advice.
 </div>
 """, unsafe_allow_html=True)
+```
