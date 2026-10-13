@@ -1,3 +1,4 @@
+import hashlib
 import traceback
 import streamlit as st
 import pandas as pd
@@ -74,6 +75,16 @@ with st.expander("Diagnostic information"):
 # --------------------------------------------------
 # 5. LOAD EACH MODEL FILE AND IDENTIFY ERRORS
 # --------------------------------------------------
+st.subheader("Model file verification")
+
+for name, path in model_paths.items():
+    with open(path, "rb") as f:
+        digest = hashlib.sha256(f.read()).hexdigest()
+
+    st.write(name)
+    st.write("Size:", path.stat().st_size)
+    st.code(digest)
+
 loaded_objects = {}
 
 for name, path in model_paths.items():
