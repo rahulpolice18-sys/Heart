@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -12,7 +11,7 @@ st.set_page_config(
     page_title="HeartCare AI | Heart Disease Prediction",
     page_icon="❤️",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="collapsed",
 )
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -52,14 +51,15 @@ html, body, [class*="css"] {
 
 .hero {
     background: linear-gradient(125deg, #063767, #087db8 65%, #20a8c9);
-    padding: 35px;
+    padding: 30px;
     border-radius: 23px;
     color: white;
-    min-height: 310px;
+    min-height: 330px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     box-shadow: 0 12px 30px rgba(6, 73, 125, 0.18);
+    box-sizing: border-box;
 }
 
 .hero-tag {
@@ -77,7 +77,7 @@ html, body, [class*="css"] {
 
 .hero h1 {
     color: white;
-    font-size: clamp(2rem, 3.3vw, 3rem);
+    font-size: clamp(1.8rem, 2.8vw, 2.65rem);
     line-height: 1.15;
     font-weight: 800;
     margin: 0 0 15px 0;
@@ -85,14 +85,14 @@ html, body, [class*="css"] {
 
 .hero p {
     color: #e5f4ff;
-    font-size: 0.96rem;
-    line-height: 1.8;
+    font-size: 0.94rem;
+    line-height: 1.75;
     margin: 0;
 }
 
 .image-frame {
     background: white;
-    padding: 10px;
+    padding: 8px;
     border: 1px solid #d7e8f8;
     border-radius: 23px;
     box-shadow: 0 12px 30px rgba(6, 73, 125, 0.12);
@@ -220,7 +220,7 @@ div[data-testid="stFormSubmitButton"] button:hover {
 
 
 # ==================================================
-# LOAD TRAINED MODEL FILES
+# LOAD MODEL FILES
 # ==================================================
 @st.cache_resource
 def load_models():
@@ -228,7 +228,7 @@ def load_models():
     scaler_path = BASE_DIR / "scaler.pkl"
     selector_path = BASE_DIR / "selector.pkl"
 
-    for path in [model_path, scaler_path, selector_path]:
+    for path in (model_path, scaler_path, selector_path):
         if not path.is_file():
             raise FileNotFoundError(
                 f"Required model file is missing: {path.name}"
@@ -246,9 +246,9 @@ try:
 except Exception:
     st.error(
         "The prediction system could not load its model files. "
-        "Please check that heart_model.pkl, scaler.pkl, and "
-        "selector.pkl are uploaded correctly and are compatible "
-        "with the installed Python libraries."
+        "Check that heart_model.pkl, scaler.pkl, and selector.pkl "
+        "are uploaded beside app.py and are compatible with the "
+        "installed libraries."
     )
     st.stop()
 
@@ -260,14 +260,14 @@ st.markdown(
     '<div class="brand">♥ HEARTCARE AI '
     '<span style="color:#6b8197;font-weight:500;">'
     '| INTELLIGENT HEALTH ANALYSIS</span></div>',
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
 
 # ==================================================
-# HERO SECTION AND HEART IMAGE
+# HERO SECTION: TEXT AND IMAGE SIDE BY SIDE
 # ==================================================
-hero_col, image_col = st.columns([1.05, 0.95], gap="large")
+hero_col, image_col = st.columns([1, 1], gap="medium")
 
 with hero_col:
     st.markdown("""
@@ -285,26 +285,32 @@ with hero_col:
 with image_col:
     image_path = BASE_DIR / "heart_banner.png"
 
-if image_path.is_file():
-    st.image(
-        str(image_path),
-        caption="Understanding the human heart",
-        use_column_width=True
-    )
-else:
-    st.warning(
-        "Image not found. Upload heart_banner.png "
-        "beside app.py in your GitHub repository."
-    )
+    if image_path.is_file():
+        st.markdown(
+            '<div class="image-frame">',
+            unsafe_allow_html=True
+        )
+        st.image(
+            str(image_path),
+            caption="Understanding the human heart",
+            width=440,
+        )
+        st.markdown("</div>", unsafe_allow_html=True)
+    else:
+        st.warning(
+            "Image not found. Upload heart_banner.png "
+            "beside app.py in your GitHub repository."
+        )
+
 
 # ==================================================
 # OVERVIEW CARDS
 # ==================================================
 st.markdown("<br>", unsafe_allow_html=True)
 
-c1, c2, c3 = st.columns(3)
+card1, card2, card3 = st.columns(3)
 
-with c1:
+with card1:
     st.markdown("""
     <div class="metric-card">
         <div class="metric-value">AI + ML</div>
@@ -312,7 +318,7 @@ with c1:
     </div>
     """, unsafe_allow_html=True)
 
-with c2:
+with card2:
     st.markdown("""
     <div class="metric-card">
         <div class="metric-value">13</div>
@@ -320,7 +326,7 @@ with c2:
     </div>
     """, unsafe_allow_html=True)
 
-with c3:
+with card3:
     st.markdown("""
     <div class="metric-card">
         <div class="metric-value">Real-time</div>
@@ -330,18 +336,18 @@ with c3:
 
 
 # ==================================================
-# INPUT FORM
+# PATIENT INPUT FORM
 # ==================================================
 st.markdown(
     '<div class="section-title">Patient Assessment</div>',
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
 st.markdown(
-    '<div class="section-subtitle">Enter all required measurements '
-    'using the same units, category codes, and feature definitions '
-    'used to train your model.</div>',
-    unsafe_allow_html=True
+    '<div class="section-subtitle">Enter the measurements using '
+    'the same units, category codes, and feature definitions used '
+    'to train your model.</div>',
+    unsafe_allow_html=True,
 )
 
 with st.form("heart_prediction_form"):
@@ -352,21 +358,28 @@ with st.form("heart_prediction_form"):
 
     with col1:
         age = st.number_input(
-            "Age (years)", min_value=1, max_value=120,
-            value=45, step=1
+            "Age (years)",
+            min_value=1,
+            max_value=120,
+            value=45,
+            step=1,
         )
 
     with col2:
         sex = st.selectbox(
             "Sex",
             [1, 0],
-            format_func=lambda x: "Male (1)" if x == 1 else "Female (0)"
+            format_func=lambda x: (
+                "Male (1)" if x == 1 else "Female (0)"
+            ),
         )
 
     with col3:
         trestbps = st.number_input(
             "Resting blood pressure (mm Hg)",
-            min_value=50, max_value=250, value=120
+            min_value=50,
+            max_value=250,
+            value=120,
         )
 
     st.markdown("#### 02 — Blood Measurements")
@@ -376,20 +389,26 @@ with st.form("heart_prediction_form"):
     with col4:
         chol = st.number_input(
             "Serum cholesterol (mg/dl)",
-            min_value=50, max_value=700, value=200
+            min_value=50,
+            max_value=700,
+            value=200,
         )
 
     with col5:
         fbs = st.selectbox(
             "Fasting blood sugar above 120 mg/dl",
             [0, 1],
-            format_func=lambda x: "No (0)" if x == 0 else "Yes (1)"
+            format_func=lambda x: (
+                "No (0)" if x == 0 else "Yes (1)"
+            ),
         )
 
     with col6:
         thalach = st.number_input(
             "Maximum heart rate achieved",
-            min_value=40, max_value=250, value=150
+            min_value=40,
+            max_value=250,
+            value=150,
         )
 
     st.markdown("#### 03 — Heart Examination")
@@ -404,21 +423,23 @@ with st.form("heart_prediction_form"):
                 0: "0 — Typical angina",
                 1: "1 — Atypical angina",
                 2: "2 — Non-anginal pain",
-                3: "3 — Asymptomatic"
-            }[x]
+                3: "3 — Asymptomatic",
+            }[x],
         )
 
     with col8:
         restecg = st.selectbox(
             "Resting ECG result",
-            [0, 1, 2]
+            [0, 1, 2],
         )
 
     with col9:
         exang = st.selectbox(
             "Exercise-induced angina",
             [0, 1],
-            format_func=lambda x: "No (0)" if x == 0 else "Yes (1)"
+            format_func=lambda x: (
+                "No (0)" if x == 0 else "Yes (1)"
+            ),
         )
 
     col10, col11, col12 = st.columns(3)
@@ -426,20 +447,23 @@ with st.form("heart_prediction_form"):
     with col10:
         oldpeak = st.number_input(
             "ST depression (oldpeak)",
-            min_value=0.0, max_value=10.0,
-            value=1.0, step=0.1, format="%.1f"
+            min_value=0.0,
+            max_value=10.0,
+            value=1.0,
+            step=0.1,
+            format="%.1f",
         )
 
     with col11:
         slope = st.selectbox(
             "ST segment slope",
-            [0, 1, 2]
+            [0, 1, 2],
         )
 
     with col12:
         ca = st.selectbox(
             "Major vessels (ca)",
-            [0, 1, 2, 3, 4]
+            [0, 1, 2, 3, 4],
         )
 
     st.markdown("#### 04 — Additional Information")
@@ -450,33 +474,33 @@ with st.form("heart_prediction_form"):
         format_func=lambda x: {
             1: "1 — Normal",
             2: "2 — Fixed defect",
-            3: "3 — Reversible defect"
-        }[x]
+            3: "3 — Reversible defect",
+        }[x],
     )
 
     submitted = st.form_submit_button(
         "♥  Analyze Measurements",
-        use_container_width=True
+        use_container_width=True,
     )
 
 
 # ==================================================
-# RUN PREDICTION
+# PREDICTION RESULTS
 # ==================================================
 if submitted:
 
     feature_names = [
         "age", "sex", "cp", "trestbps", "chol",
         "fbs", "restecg", "thalach", "exang",
-        "oldpeak", "slope", "ca", "thal"
+        "oldpeak", "slope", "ca", "thal",
     ]
 
     input_data = pd.DataFrame(
         [[
             age, sex, cp, trestbps, chol, fbs, restecg,
-            thalach, exang, oldpeak, slope, ca, thal
+            thalach, exang, oldpeak, slope, ca, thal,
         ]],
-        columns=feature_names
+        columns=feature_names,
     )
 
     try:
@@ -486,7 +510,7 @@ if submitted:
 
         st.markdown(
             '<div class="section-title">Prediction Results</div>',
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
         if prediction == 1:
@@ -508,7 +532,7 @@ if submitted:
             <div class="result-card">
                 <div class="result-negative">
                     <div class="result-heading">
-                        Lower-Risk Class Predicted by the Model
+                        Class 0 Predicted by the Model
                     </div>
                     The model classified the entered measurements as
                     class 0. This result does not rule out heart disease.
@@ -531,11 +555,13 @@ if submitted:
                     probabilities[classes.index(1)] * 100
                 )
 
-                st.markdown("#### Model probability for class 1")
+                st.markdown(
+                    "#### Model probability for class 1"
+                )
 
                 st.progress(
                     int(np.clip(round(probability), 0, 100)),
-                    text=f"Class 1 probability: {probability:.1f}%"
+                    text=f"Class 1 probability: {probability:.1f}%",
                 )
 
                 st.caption(
@@ -572,4 +598,3 @@ st.markdown("""
     Not a substitute for professional medical advice.
 </div>
 """, unsafe_allow_html=True)
-
