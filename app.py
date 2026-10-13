@@ -24,10 +24,17 @@ if missing:
 
 try:
     model = joblib.load(MODEL_PATH)
+    st.success("Model loaded successfully")
+
     scaler = joblib.load(SCALER_PATH)
+    st.success("Scaler loaded successfully")
+
     selector = joblib.load(SELECTOR_PATH)
+    st.success("Selector loaded successfully")
+
 except Exception as exc:
-    st.error(f"Could not load the model files: {exc}")
+    st.error(f"Error type: {type(exc).__name__}")
+    st.error(f"Error details: {repr(exc)}")
     st.stop()
 
 st.subheader("Patient Information")
